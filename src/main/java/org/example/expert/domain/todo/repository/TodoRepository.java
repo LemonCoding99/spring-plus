@@ -7,11 +7,40 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TodoRepository extends JpaRepository<Todo, Long> {
 
-    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u ORDER BY t.modifiedAt DESC")
+    // weather 조건O, 기간 조건O
+    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u " +
+            "WHERE t.weather = :weather " +
+            "AND t.modifiedAt between :modifiedStart AND :modifiedEnd " +
+            "ORDER BY t.modifiedAt desc")
+    Page<Todo> findByWeatherAndModified(@Param("weather") String weather,
+                                          @Param("modifiedStart")LocalDateTime modifiedStart,
+                                          @Param("modifiedEnd")LocalDateTime modifiedEnd,
+                                          Pageable pageable);
+
+    // weather 조건O, 기간 조건 X
+    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u " +
+            "WHERE t.weather = :weather " +
+            "ORDER BY t.modifiedAt desc")
+    Page<Todo> findByWeather(@Param("weather") String weather,
+                             Pageable pageable);
+
+    // weather 조건X, 기간 조건O
+    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u " +
+            "WHERE t.modifiedAt between :modifiedStart AND :modifiedEnd " +
+            "ORDER BY t.modifiedAt desc")
+    Page<Todo> findByModified(@Param("modifiedStart") LocalDateTime modifiedStart,
+                                @Param("modifiedEnd") LocalDateTime modifiedEnd,
+                                Pageable pageable);
+
+    // weather 조건X, 기간 조건 X
+    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u " +
+            "ORDER BY t.modifiedAt desc")
     Page<Todo> findAllByOrderByModifiedAtDesc(Pageable pageable);
 
     @Query("SELECT t FROM Todo t " +
