@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface TodoRepository extends JpaRepository<Todo, Long> {
+public interface TodoRepository extends JpaRepository<Todo, Long>, TodoCustomRepository {
 
     // weather 조건O, 기간 조건O
     @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u " +
@@ -43,8 +43,9 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
             "ORDER BY t.modifiedAt desc")
     Page<Todo> findAllByOrderByModifiedAtDesc(Pageable pageable);
 
-    @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN t.user " +
-            "WHERE t.id = :todoId")
-    Optional<Todo> findByIdWithUser(@Param("todoId") Long todoId);
+    // QueryDsl로 바꿔주었습니다.
+//    @Query("SELECT t FROM Todo t " +
+//            "LEFT JOIN t.user " +
+//            "WHERE t.id = :todoId")
+//    Optional<Todo> findByIdWithUser(@Param("todoId") Long todoId);
 }
